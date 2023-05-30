@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function TodoList() {
   const [todo, setTodo] = useState("");
@@ -20,9 +22,12 @@ function TodoList() {
 
   function onsubmit() {
     axios.post("http://localhost:4000/todos/", {
-      content: todo
-    }).then(() => {
-      window.location.reload();
+      content: todo,
+      checkde: false
+    }).then((res) => {
+      toast.success("일정 등록 완료!");
+      setTodoList(prevTodo => { return [...prevTodo, res.data] })
+      // window.location.reload();
     })
   }
 
@@ -65,7 +70,7 @@ function TodoList() {
           return (
             <div className="card mt-2" key={index}>
               <div className="card-body d-flex justify-content-between align-items-center">
-                <div>
+                <div className="flex-fill">
                   <input
                     checked={item.checked}
                     onChange={(event) => handleCheck(event, item.id, item.content)} // 체크박스는 무조건 onChange 써야함!!
@@ -81,7 +86,27 @@ function TodoList() {
                     {item.content}
                   </span>
                 </div>
-                <button onClick={() => onDelete(item.id)} className="btn btn-danger">삭제</button>
+                <div className="d-flex">
+                  <Link
+                    to={"/todo/modify/" + item.id}
+                    state={{
+                      id: item.id,
+                      content: item.content,
+                      checked: item.checked
+                    }}
+                    style={{ width: "60px" }}
+                    className="btn btn-success me-2"
+                  >
+                    수정
+                  </Link>
+                  <button
+                    style={{ width: "60px" }}
+                    onClick={() => onDelete(item.id)}
+                    className="btn btn-danger"
+                  >
+                    삭제
+                  </button>
+                </div>
               </div>
             </div>
           )
